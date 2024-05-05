@@ -1,25 +1,30 @@
-package com.mygdx.dog;
+package com.mygdx.Game;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class dog extends ApplicationAdapter {
+public class Game extends ApplicationAdapter {
+	private Stage stage;
+	private Table container;
 	SpriteBatch batch;
 	private Texture dogTexture;
 	private Texture slimeTexture;
@@ -82,12 +87,45 @@ public class dog extends ApplicationAdapter {
 	@Override
 	public void create () {
 
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, WIDTH, HEIGHT);
+		stage = new Stage(new ScreenViewport());
+		Gdx.input.setInputProcessor(stage);
 		font = new BitmapFont();
 		font.getData().setScale(1.0f);
 		spriteBatch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
+
+		container = new Table();
+		stage.addActor(container);
+
+		Table table = new Table();
+
+		final ScrollPane scroll = new ScrollPane(table);
+		scroll.setScrollingDisabled(true, false);
+		table.row();
+
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Minecraft 2.ttf"));
+		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		parameter.size = 30;
+		parameter.borderWidth = 1;
+		parameter.color = Color.WHITE;
+		parameter.shadowOffsetX = 3;
+		parameter.shadowOffsetY = 3;
+		parameter.shadowColor = new Color(0, 0.5f, 0, 0.75f);
+		BitmapFont font24 = generator.generateFont(parameter); // font size 24 pixels
+		generator.dispose();
+
+		Label.LabelStyle labelStyle = new Label.LabelStyle();
+		labelStyle.font = font24;
+
+		Label label2 = new Label("Hercules was the son of Zeus, king of the gods, and the mortal woman Alcmene. Zeus, who was always chasing one woman or another, took on the form of Alcmene's husband, Amphitryon, and visited Alcmene one night in her bed, and so Hercules was born a demi-god with incredible strength and stamina.",labelStyle);
+		label2.setSize(500, 100);
+		label2.setPosition(600,200);
+		label2.setWrap(true);
+		//stage.addActor(label2);
+		table.add(label2).width(500);
+
+		container.add(scroll);
+
 
 		// create player
 		player = new Player(0,0,128, 128);
@@ -123,19 +161,19 @@ public class dog extends ApplicationAdapter {
 		state = Player.State.IDLE;
 	}
 
+	public void resize(int width, int height)
+	{
+		stage.getViewport().update(width, height);
+	}
+
 	@Override
 	public void render () {
+		stateTime += Gdx.graphics.getDeltaTime(); // Accumulate elapsed animation time.
 		ScreenUtils.clear(0, 0, 0, 0); // clear screen
 
+		stage.act();
+		stage.draw();
 
-		if(!game)
-		{
-			spriteBatch.begin();
-			font.draw(spriteBatch, "YOU LOSE LOSER!", WIDTH/2, HEIGHT/2);
-			spriteBatch.end();
-			return;
-		}
-		stateTime += Gdx.graphics.getDeltaTime(); // Accumulate elapsed animation time.
 		TextureRegion currentDog;
 		TextureRegion currentSlime;
 
@@ -266,7 +304,6 @@ public class dog extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		spriteBatch.dispose();
-		dogTexture.dispose();
 		slimeTexture.dispose();
 	}
 }

@@ -4,7 +4,7 @@
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
 
 	<inherits name='dog' />
-	<entry-point class='com.mygdx.dog.client.HtmlLauncher' />
+	<entry-point class='com.mygdx.Game.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 	<set-configuration-property name="gdx.assetpath" value="../assets" />
 	<set-property name="user.agent" value="gecko1_8, safari"/>
